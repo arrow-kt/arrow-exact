@@ -1,5 +1,6 @@
 package number
 
+import ArrowExactConstraintViolationError
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -31,13 +32,33 @@ value class PositiveDouble private constructor(val value: Double) : Comparable<P
     fun fromDouble(value: Double): Option<PositiveDouble> =
       if (value > 0.0 && value.isFinite()) Some(PositiveDouble(value)) else None
 
-    fun unsafe(value: Double): PositiveDouble = fromDouble(value).fold(
+    fun unsafe(
+      value: Double,
+      tag: String = "PositiveDouble#unsafe"
+    ): PositiveDouble = fromDouble(value).fold(
       ifEmpty = {
-        throw IllegalArgumentException("PositiveDouble#unsafe error: value \"$value\" must be positive and finite.")
+        throw ArrowExactPositiveDoubleConstraintError(
+          violatingValue = value,
+          tag = tag,
+        )
       },
       ifSome = { it }
     )
 
-    operator fun invoke(value: Double): Option<PositiveDouble> = fromDouble(value)
+    operator fun invoke(value: Double): PositiveDouble = unsafe(value)
   }
 }
+
+fun PositiveDouble.mapSafe(f: (Double) -> Double): Option<PositiveDouble> =
+  PositiveDouble.fromDouble(f(value))
+
+
+class ArrowExactPositiveDoubleConstraintError(
+  violatingValue: Double,
+  tag: String?,
+) : ArrowExactConstraintViolationError(
+  constraint = "PositiveDouble",
+  requirement = "a positive and finite number",
+  violatingValue = violatingValue,
+  tag = tag
+)

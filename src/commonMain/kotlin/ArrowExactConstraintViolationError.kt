@@ -1,8 +1,8 @@
-data class ArrowExactConstraintError(
-  private val constraint: String,
-  private val violatingValue: Any,
-  private val tag: String?,
-  private val requirement: String,
+open class ArrowExactConstraintViolationError(
+  val constraint: String,
+  val requirement: String,
+  val violatingValue: Any,
+  val tag: String?,
 ) : IllegalArgumentException(errorMessage(constraint, violatingValue, tag, requirement))
 
 private fun errorMessage(
@@ -11,16 +11,16 @@ private fun errorMessage(
   tag: String?,
   requirement: String,
 ): String = buildString {
-  append("ArrowExact $constraint constraint violated")
+  append("[ArrowExact] $constraint constraint violated")
   tag?.let {
-    append(" in \"$it\" call")
+    append(" in \"$it\"")
   }
-  append(": $violatingValue must be $requirement.")
+  append(". The value \"$violatingValue\" doesn't meet the requirement: \"Must be $requirement.\"")
 }
 
 
 fun main() {
-  throw ArrowExactConstraintError(
+  throw ArrowExactConstraintViolationError(
     constraint = "PositiveDouble",
     violatingValue = -3.5,
     tag = "main test",
