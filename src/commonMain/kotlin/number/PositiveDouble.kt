@@ -168,7 +168,7 @@ value class PositiveDouble private constructor(val value: Double) : Comparable<P
      * @return [PositiveDouble] if the provided [Double] value is positive and finite, otherwise, throws an exception.
      * @throws [ArrowExactPositiveDoubleConstraintError] when the provided [value] isn't positive and finite.
      */
-    operator fun invoke(value: Double): PositiveDouble = unsafe(value)
+    operator fun invoke(value: Double): PositiveDouble = unsafe(value, tag = "PositiveDouble()")
   }
 
 }
