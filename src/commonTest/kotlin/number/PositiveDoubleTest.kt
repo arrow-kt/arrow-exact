@@ -3,7 +3,7 @@ package number
 import arrow.core.Some
 import io.kotest.assertions.arrow.core.shouldBeNone
 import io.kotest.assertions.arrow.core.shouldBeSome
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.comparables.shouldBeGreaterThan
@@ -13,13 +13,13 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.double
 import io.kotest.property.checkAll
 
-class PositiveDoubleTest : FreeSpec({
-  "[PROPERTY] ∀ PositiveDouble is a positive and finite number" {
+class PositiveDoubleDoubleTest : FreeSpec({
+  "[PROPERTY] ∀ PositiveDoubleDouble is a PositiveDouble and finite number" {
     checkAll(Arb.double()) { double ->
-      val positiveDouble = PositiveDouble.fromDouble(double)
+      val option = PositiveDouble.fromDouble(double)
 
-      if (positiveDouble is Some) {
-        val wrappedValue = positiveDouble.value.value
+      if (option is Some) {
+        val wrappedValue = option.value.value
         wrappedValue shouldBeGreaterThan 0.0
         wrappedValue.isFinite().shouldBeTrue()
       }
@@ -27,7 +27,7 @@ class PositiveDoubleTest : FreeSpec({
   }
 
   "[UNHAPPY] Unsafe calls throws understandable exception" {
-    val err = shouldThrow<ArrowExactPositiveDoubleConstraintError> {
+    val err = shouldThrowExactly<ArrowExactPositiveDoubleConstraintError> {
       PositiveDouble.unsafe(-3.14)
     }
 
@@ -39,42 +39,48 @@ class PositiveDoubleTest : FreeSpec({
     err.message shouldContain "positive"
   }
 
-  // region Edge cases
+  "fromDouble" - {
+    "[EDGE] Double.PositiveDouble_INFINITY is None" {
+      val res = PositiveDouble.fromDouble(Double.POSITIVE_INFINITY)
+
+      res.shouldBeNone()
+    }
+
+    "[EDGE] Double.NEGATIVE_INFINITY is None" {
+      val res = PositiveDouble.fromDouble(Double.NEGATIVE_INFINITY)
+
+      res.shouldBeNone()
+    }
+  }
+
+  "Addition" - {
+    "[HAPPY] 1 + 2 = 3" {
+      val res = PositiveDouble(1.0) + PositiveDouble(2.0)
+      res shouldBeSome PositiveDouble(3.0)
+    }
+
+    "[EDGE] Double.MAX_VALUE + 1 = Double.MAX_VALUE" {
+      val res = PositiveDouble(Double.MAX_VALUE) + PositiveDouble(1.0)
+
+      res.shouldBeSome(PositiveDouble(Double.MAX_VALUE))
+    }
+
+    "[EDGE] Double.MAX_VALUE + some big number = Double.MAX_VALUE" {
+      val res = PositiveDouble(Double.MAX_VALUE) + PositiveDouble(1_000_000_000_000_000.0)
+
+      res.shouldBeSome(PositiveDouble(Double.MAX_VALUE))
+    }
+
+    "[EDGE] Double.MAX_VALUE + Double.MAX_VALUE is None" {
+      val res = PositiveDouble(Double.MAX_VALUE) + PositiveDouble(Double.MAX_VALUE)
+
+      res.shouldBeNone()
+    }
+  }
+
   "[EDGE] Double.MAX_VALUE * Double.MAX_VALUE is None" {
-    val res = positive(Double.MAX_VALUE) * positive(Double.MAX_VALUE)
+    val res = PositiveDouble(Double.MAX_VALUE) * PositiveDouble(Double.MAX_VALUE)
     res.shouldBeNone()
   }
 
-  "[EDGE] Double.MAX_VALUE + 1 = Double.MAX_VALUE" {
-    val res = positive(Double.MAX_VALUE) + positive(1.0)
-
-    res.shouldBeSome(positive(Double.MAX_VALUE))
-  }
-
-  "[EDGE] Double.MAX_VALUE + 100 = Double.MAX_VALUE" {
-    val res = positive(Double.MAX_VALUE) + positive(1_000.0)
-
-    res.shouldBeSome(positive(Double.MAX_VALUE))
-  }
-
-  "[EDGE] Double.MAX_VALUE + Double.MAX_VALUE is None" {
-    val res = positive(Double.MAX_VALUE) + positive(Double.MAX_VALUE)
-
-    res.shouldBeNone()
-  }
-
-  "[EDGE] Double.POSITIVE_INFINITY is None" {
-    val res = PositiveDouble.fromDouble(Double.POSITIVE_INFINITY)
-
-    res.shouldBeNone()
-  }
-
-  "[EDGE] Double.NEGATIVE_INFINITY is None" {
-    val res = PositiveDouble.fromDouble(Double.NEGATIVE_INFINITY)
-
-    res.shouldBeNone()
-  }
-  // endregion
 })
-
-fun positive(double: Double): PositiveDouble = PositiveDouble(double)
