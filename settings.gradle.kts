@@ -1,1 +1,1 @@
-rootProject.name = "ArrowMPPTemplate"
+rootProject.name = "Arrow Exact"
