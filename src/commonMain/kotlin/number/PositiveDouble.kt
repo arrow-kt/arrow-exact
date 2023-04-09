@@ -4,6 +4,7 @@ import ArrowExactConstraintViolationError
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.identity
 import number.PositiveDouble.Companion.fromDouble
 import number.PositiveDouble.Companion.invoke
 import kotlin.jvm.JvmInline
@@ -158,7 +159,7 @@ value class PositiveDouble private constructor(val value: Double) : Comparable<P
           tag = tag,
         )
       },
-      ifSome = { it }
+      ifSome = ::identity
     )
 
     /**
