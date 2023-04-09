@@ -7,6 +7,7 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.comparables.shouldBeGreaterThan
+import io.kotest.matchers.doubles.beWithinPercentageOf
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.property.Arb
@@ -62,13 +63,13 @@ class PositiveDoubleDoubleTest : FreeSpec({
     "[EDGE] Double.MAX_VALUE + 1 = Double.MAX_VALUE" {
       val res = PositiveDouble(Double.MAX_VALUE) + PositiveDouble(1.0)
 
-      res.shouldBeSome(PositiveDouble(Double.MAX_VALUE))
+      res shouldBeSome PositiveDouble(Double.MAX_VALUE)
     }
 
     "[EDGE] Double.MAX_VALUE + some big number = Double.MAX_VALUE" {
       val res = PositiveDouble(Double.MAX_VALUE) + PositiveDouble(1_000_000_000_000_000.0)
 
-      res.shouldBeSome(PositiveDouble(Double.MAX_VALUE))
+      res shouldBeSome PositiveDouble(Double.MAX_VALUE)
     }
 
     "[EDGE] Double.MAX_VALUE + Double.MAX_VALUE is None" {
@@ -78,9 +79,27 @@ class PositiveDoubleDoubleTest : FreeSpec({
     }
   }
 
-  "[EDGE] Double.MAX_VALUE * Double.MAX_VALUE is None" {
-    val res = PositiveDouble(Double.MAX_VALUE) * PositiveDouble(Double.MAX_VALUE)
-    res.shouldBeNone()
+  "Multiplication" - {
+    "[HAPPY] 2 * 3 = 6" {
+      val res = PositiveDouble(2.0) * PositiveDouble(3.0)
+      res shouldBeSome PositiveDouble(6.0)
+    }
+
+    "[EDGE] Double.MAX_VALUE * 0.5 = Double.MAX_VALUE / 2" {
+      val res = PositiveDouble(Double.MAX_VALUE) * PositiveDouble(0.5)
+      res.shouldBeSome()
+      res.value.value shouldBe beWithinPercentageOf(Double.MAX_VALUE / 2, 1.0)
+    }
+
+    "[EDGE] Double.MAX_VALUE * 2 is None" {
+      val res = PositiveDouble(Double.MAX_VALUE) * PositiveDouble(2.0)
+      res.shouldBeNone()
+    }
+
+    "[EDGE] Double.MAX_VALUE * Double.MAX_VALUE is None" {
+      val res = PositiveDouble(Double.MAX_VALUE) * PositiveDouble(Double.MAX_VALUE)
+      res.shouldBeNone()
+    }
   }
 
 })
