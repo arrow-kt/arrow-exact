@@ -13,7 +13,7 @@ class ExactSpec : StringSpec({
   }
 
   "throws exception on failed check" {
-    shouldThrow<IllegalArgumentException> {
+    shouldThrow<ExactException> {
       NotBlankTrimmedString.fromOrThrow("  ")
     }
   }
@@ -27,11 +27,11 @@ class ExactSpec : StringSpec({
   }
 
   "returns right" {
-    val either = NotBlankTrimmedString.fromOrEither("  test  ")
+    val either = NotBlankTrimmedString.from("  test  ")
     either.map { it.str } shouldBeRight "test"
   }
 
   "returns left" {
-    NotBlankTrimmedString.fromOrEither("    ").isLeft() shouldBe true
+    NotBlankTrimmedString.from("    ").isLeft() shouldBe true
   }
 })

@@ -7,15 +7,15 @@ internal class AndExact<A, B, C>(
   private val exact2: Exact<B, C>
 ) : Exact<A, C> {
 
-  override fun fromOrEither(value: A): Either<ExactError, C> {
-    return exact1.fromOrEither(value)
-      .flatMap { exact2.fromOrEither(it) }
+  override fun from(value: A): Either<ExactError, C> {
+    return exact1.from(value)
+      .flatMap { exact2.from(it) }
   }
 }
 
 fun <A, B> exact(predicate: Predicate<A>, constructor: (A) -> B): Exact<A, B> {
   return object : Exact<A, B> {
-    override fun fromOrEither(value: A): Either<ExactError, B> {
+    override fun from(value: A): Either<ExactError, B> {
       return if (predicate.invoke(value)) {
         constructor.invoke(value).right()
       } else {

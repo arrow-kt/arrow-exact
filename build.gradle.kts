@@ -1,6 +1,6 @@
 plugins {
-  kotlin("multiplatform") version "1.6.21" apply true
-  id("io.kotest.multiplatform") version "5.3.0" apply true
+  kotlin("multiplatform") version "1.8.21" apply true
+  id("io.kotest.multiplatform") version "5.6.0" apply true
 }
 
 group "org.example"
@@ -25,7 +25,6 @@ kotlin {
 
   mingwX64()
 
-  iosArm32()
   iosArm64()
   iosSimulatorArm64()
   iosX64()
@@ -38,33 +37,27 @@ kotlin {
   watchosArm64()
   watchosSimulatorArm64()
   watchosX64()
-  watchosX86()
 
   sourceSets {
     commonMain {
       dependencies {
         implementation(kotlin("stdlib-common"))
-        implementation("io.arrow-kt:arrow-core:1.1.3-alpha.39")
-        implementation("io.arrow-kt:arrow-optics:1.1.3-alpha.39")
-        implementation("io.arrow-kt:arrow-fx-coroutines:1.1.3-alpha.39")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+        implementation("io.arrow-kt:arrow-core:1.2.0-RC")
       }
     }
 
     commonTest {
       dependencies {
-        implementation("io.kotest:kotest-property:5.3.0")
-        implementation("io.kotest:kotest-framework-engine:5.3.0")
-        implementation("io.kotest:kotest-assertions-core:5.3.0")
-        implementation("io.kotest.extensions:kotest-assertions-arrow:1.2.5")
-        implementation("io.kotest.extensions:kotest-property-arrow:1.2.5") // optional
-        implementation("io.kotest.extensions:kotest-property-arrow-optics:1.2.5") // optional
+        implementation("io.kotest:kotest-property:5.6.1")
+        implementation("io.kotest:kotest-framework-engine:5.6.1")
+        implementation("io.kotest:kotest-assertions-core:5.6.1")
+        implementation("io.kotest.extensions:kotest-assertions-arrow:1.3.3")
       }
     }
 
     val jvmTest by getting {
       dependencies {
-        implementation("io.kotest:kotest-runner-junit5-jvm:5.3.0")
+        implementation("io.kotest:kotest-runner-junit5-jvm:5.6.1")
       }
     }
   }

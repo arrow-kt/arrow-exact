@@ -11,7 +11,7 @@ class NotBlankTrimmedString private constructor(val str: String) {
 
   private object TrimmedString : Exact<NotBlankString, NotBlankTrimmedString> {
 
-    override fun fromOrEither(value: NotBlankString): Either<ExactError, NotBlankTrimmedString> {
+    override fun from(value: NotBlankString): Either<ExactError, NotBlankTrimmedString> {
       val trimmed = value.str.trim()
       return NotBlankTrimmedString(trimmed).right()
     }

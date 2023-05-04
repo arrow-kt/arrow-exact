@@ -4,18 +4,20 @@ import arrow.core.*
 
 interface Exact<A, out B> {
 
-  fun fromOrEither(value: A): Either<ExactError, B>
+  fun from(value: A): Either<ExactError, B>
 
   fun fromOrNull(value: A): B? {
-    return fromOrEither(value).orNull()
+    return from(value).getOrNull()
   }
 
   fun fromOrThrow(value: A): B {
-    return when (val result = fromOrEither(value)) {
-      is Either.Left -> throw IllegalArgumentException(result.value.message)
+    return when (val result = from(value)) {
+      is Either.Left -> throw ExactException(result.value.message)
       is Either.Right -> result.value
     }
   }
 }
 
+open class ExactError(val message: String)
 
+class ExactException(message: String) : IllegalArgumentException(message)
