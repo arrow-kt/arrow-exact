@@ -2,19 +2,18 @@ package arrow.exact
 
 import arrow.core.*
 import arrow.core.raise.Raise
-import arrow.core.raise.recover
-import kotlin.jvm.JvmInline
+import arrow.core.raise.either
 
 @DslMarker
 annotation class ExactBuilderDsl
 
 @ExactBuilderDsl
 fun <A, Constraint> exactBuilder(
-  block: (ExactBuilder<A, Constraint>) -> Either<ExactError, Constraint>
+  build: (ExactBuilder<A, Constraint>) -> Either<ExactError, Constraint>
 ): Exact<A, Constraint> {
   return object : Exact<A, Constraint> {
     override fun from(value: A): Either<ExactError, Constraint> =
-      block(ExactBuilderImpl(value.right()))
+      build(ExactBuilderImpl(value.right()))
   }
 }
 
@@ -23,8 +22,8 @@ private class ExactBuilderImpl<A, Constraint>(
 ) : ExactBuilder<A, Constraint> {
 
   override fun mustBe(predicate: Predicate<A>): ExactBuilder<A, Constraint> = ExactBuilderImpl(
-    value = value.flatMap {
-      if (predicate(it)) it.right() else ExactError("Predicate failed").left()
+    value = value.flatMap { a ->
+      if (predicate(a)) a.right() else ExactError("Predicate failed for value: $a").left()
     }
   )
 
@@ -35,8 +34,8 @@ private class ExactBuilderImpl<A, Constraint>(
   override fun <B> transformOrRaise(
     transformation: Raise<ExactError>.(A) -> B
   ): ExactBuilder<B, Constraint> = ExactBuilderImpl(
-    value = value.flatMap {
-      recover({ transformation(it).right() }) { ExactError("Transform or raise failed").left() }
+    value = value.flatMap { a ->
+      either { transformation(a) }
     }
   )
 
@@ -55,13 +54,4 @@ interface ExactBuilder<A, Constraint> {
 
   @ExactBuilderDsl
   fun build(constructor: (A) -> Constraint): Either<ExactError, Constraint>
-}
-
-@JvmInline
-value class NotBlankTrimmedString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankTrimmedString> by exactBuilder({
-    it.mustBe(String::isNotBlank)
-      .transform(String::trim)
-      .build(::NotBlankTrimmedString)
-  })
 }
