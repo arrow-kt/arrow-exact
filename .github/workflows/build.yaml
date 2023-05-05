@@ -22,7 +22,7 @@ jobs:
 
       - name: Restore Gradle cache
         id: cache
-        uses: actions/cache@v3.0.2
+        uses: actions/cache@v3.3.1
         with:
           path: |
             ~/.gradle/caches
