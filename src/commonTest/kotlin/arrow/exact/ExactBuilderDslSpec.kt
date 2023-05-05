@@ -1,11 +1,13 @@
 package arrow.exact
 
+import arrow.core.Either
 import arrow.core.raise.ensureNotNull
-import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.assertions.arrow.core.shouldBeLeft
+import io.kotest.assertions.failure
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.data.row
 import io.kotest.datatest.withData
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import kotlin.jvm.JvmInline
 
 sealed interface Artificial {
@@ -14,8 +16,8 @@ sealed interface Artificial {
 }
 
 @JvmInline
-value class ArtificialExample private constructor(val value: Artificial) {
-  companion object : Exact<String, ArtificialExample> by exactBuilder({ builder ->
+value class ArtificialConstraintType private constructor(val value: Artificial) {
+  companion object : Exact<String, ArtificialConstraintType> by exactBuilder({ builder ->
     builder.mustBe(String::isNotBlank)
       .transform(String::trim)
       .transformOrRaise {
@@ -30,21 +32,23 @@ value class ArtificialExample private constructor(val value: Artificial) {
           else -> raise(ExactError("Unknown value: $it"))
         }
       }
-      .build(::ArtificialExample)
+      .build(::ArtificialConstraintType)
   })
 }
 
 class ExactBuilderDslSpec : FreeSpec({
   "artificial user" {
-    val res = ArtificialExample.from("u/123")
-
-    res shouldBeRight Artificial.User(123)
+    when (val res = ArtificialConstraintType.from("u/123")) {
+      is Either.Left -> failure(res.value.message)
+      is Either.Right -> res.value.value shouldBe Artificial.User(123)
+    }
   }
 
   "artificial admin" {
-    val res = ArtificialExample.from("a/")
-
-    res shouldBeRight Artificial.Admin
+    when (val res = ArtificialConstraintType.from("a/")) {
+      is Either.Left -> failure(res.value.message)
+      is Either.Right -> res.value.value shouldBe Artificial.Admin
+    }
   }
 
   "invalid" - {
@@ -54,9 +58,9 @@ class ExactBuilderDslSpec : FreeSpec({
       row("Okay"),
       row("u/Fail"),
     ) { (string) ->
-      val res = ArtificialExample.from(string)
+      val res = ArtificialConstraintType.from(string)
 
-      res.isLeft().shouldBeTrue()
+      res.shouldBeLeft()
     }
   }
 })
