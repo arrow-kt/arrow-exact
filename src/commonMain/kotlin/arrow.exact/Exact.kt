@@ -1,6 +1,6 @@
 package arrow.exact
 
-import arrow.core.*
+import arrow.core.Either
 
 interface Exact<A, out B> {
 
@@ -18,6 +18,6 @@ interface Exact<A, out B> {
   }
 }
 
-open class ExactError(val message: String)
+class ExactError(val message: String)
 
 class ExactException(message: String) : IllegalArgumentException(message)
