@@ -1,21 +1,33 @@
 package arrow.exact.demo
 
 import arrow.core.Either
+import arrow.core.flatMap
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import arrow.core.raise.ensureNotNull
+import arrow.core.right
 import arrow.exact.*
 import kotlin.jvm.JvmInline
+import kotlin.random.Random
+
+// TODO: We need a lint check telling people to make their constructors private
+@JvmInline
+value class NotBlankString private constructor(
+  override val value: String
+) : Refined<String> {
+  companion object : Exact<String, NotBlankString> by exact({
+    ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+    NotBlankString(it)
+  })
+}
 
 // TODO: We need a lint check telling people to make their constructors private
 @JvmInline
 value class NotBlankTrimmedString private constructor(
   override val value: String
 ) : Refined<String> {
-  companion object : Exact<String, NotBlankTrimmedString> by exact({
-    val trimmed = it.trim().takeIf(String::isNotBlank)
-    ensureNotNull(trimmed) { ExactError("Cannot be blank.") }
-    NotBlankTrimmedString(trimmed)
+  companion object : Exact<String, NotBlankTrimmedString> by exact({ raw ->
+    val notBlank = NotBlankString.from(raw).bind()
+    NotBlankTrimmedString(notBlank.value.trim())
   })
 }
 
@@ -28,14 +40,26 @@ sealed interface UsernameError {
 value class Username private constructor(
   override val value: String
 ) : Refined<String> {
-  companion object : ExactEither<UsernameError, String, Username> by exactEither({
-    ensure(it.isNotBlank() && it.length < 100) { UsernameError.Invalid }
-    ensure(it !in listOf("offensive")) { UsernameError.Offensive(it) }
-    Username(it.trim())
+  companion object : ExactEither<UsernameError, String, Username> by exactEither({ rawUsername ->
+    val username = NotBlankTrimmedString.from(rawUsername) // compose Exact
+      .mapLeft { UsernameError.Invalid }.bind().value
+    ensure(username.length < 100) { UsernameError.Invalid }
+    ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
+    Username(username)
   })
 }
 
-fun demo(): Either<String, NotBlankTrimmedString> = either {
+@JvmInline
+value class PositiveInt private constructor(
+  override val value: Int
+) : Refined<Int> {
+  companion object : Exact<Int, PositiveInt> by exact({
+    ensure(it > 0) { ExactError("Must be positive.") }
+    PositiveInt(it)
+  })
+}
+
+fun demo(): Either<String, Unit> = either {
   val hello = NotBlankTrimmedString("Hello")
   val world = NotBlankTrimmedString("World")
 
@@ -44,5 +68,10 @@ fun demo(): Either<String, NotBlankTrimmedString> = either {
   val username = Username.from("user1")
     .mapLeft { it.toString() }.bind()
 
-  hello
+
+  val x = PositiveInt(3)
+  val y = PositiveInt.from(Random.nextInt())
+  val z = y.flatMap { y1 ->
+    PositiveInt(x.value + y1.value).right()
+  }
 }

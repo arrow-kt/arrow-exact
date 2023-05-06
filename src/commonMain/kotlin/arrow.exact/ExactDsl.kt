@@ -20,3 +20,7 @@ fun <E : Any, A, R : Refined<A>> exactEither(
 ): ExactEither<E, A, R> = object : ExactEither<E, A, R> {
   override fun from(value: A): Either<E, R> = either { construct(value) }
 }
+
+// TODO: Add any relevant extensions to Refined<A>
+
+fun <A, B> Refined<A>.map(f: (A) -> B): B = f(value)
