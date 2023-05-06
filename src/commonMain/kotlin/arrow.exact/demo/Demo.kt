@@ -1,10 +1,8 @@
 package arrow.exact.demo
 
+import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
-import arrow.exact.Exact
-import arrow.exact.ExactError
-import arrow.exact.Refined
-import arrow.exact.exact
+import arrow.exact.*
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -18,7 +16,25 @@ value class NotBlankTrimmedString private constructor(
   })
 }
 
-fun main() {
-  val str = NotBlankTrimmedString("Hello")
+sealed interface UsernameError {
+  object Invalid : UsernameError
+  data class Offensive(val username: String) : UsernameError
+}
 
+@JvmInline
+value class Username private constructor(
+  override val value: String
+) : Refined<String> {
+  companion object : ExactEither<UsernameError, String, Username> by exactEither({
+    ensure(it.isNotBlank() && it.length < 100) { UsernameError.Invalid }
+    ensure(it !in listOf("offensive")) { UsernameError.Offensive(it) }
+    Username(it.trim())
+  })
+}
+
+fun main() {
+  val hello = NotBlankTrimmedString("Hello")
+  val world = NotBlankTrimmedString("World")
+
+  val helloWorld = NotBlankTrimmedString.fromOrNull(hello.value + " " + world.value)
 }

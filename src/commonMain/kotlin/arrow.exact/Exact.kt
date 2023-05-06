@@ -2,20 +2,21 @@ package arrow.exact
 
 import arrow.core.Either
 import arrow.core.raise.Raise
-import arrow.core.raise.either
 
 
-interface Exact<A, out R : Refined<A>> : ExactWithError<A, ExactError, R>
+interface Exact<A, out R : Refined<A>> : ExactEither<ExactError, A, R>
 
 data class ExactError(val message: String)
 
-interface ExactWithError<A, out E : Any, out R : Refined<A>> {
+interface ExactEither<out E : Any, A, out R : Refined<A>> {
 
-  fun Raise<E>.from(value: A): R
+  fun from(value: A): Either<E, R>
 
-  fun fromOrNull(value: A): R? = either { from(value) }.getOrNull()
+  fun Raise<E>.fromOrRaise(value: A): R = from(value).bind()
 
-  fun fromOrThrow(value: A): R = when (val result = either { from(value) }) {
+  fun fromOrNull(value: A): R? = from(value).getOrNull()
+
+  fun fromOrThrow(value: A): R = when (val result = from(value)) {
     is Either.Left -> throw ExactException(result.value)
     is Either.Right -> result.value
   }
