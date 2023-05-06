@@ -1,7 +1,6 @@
 package arrow.exact
 
 import arrow.core.Either
-import arrow.core.raise.Raise
 
 
 interface Exact<A, out R : Refined<A>> : ExactEither<ExactError, A, R>
@@ -12,7 +11,8 @@ interface ExactEither<out E : Any, A, out R : Refined<A>> {
 
   fun from(value: A): Either<E, R>
 
-  fun Raise<E>.fromOrRaise(value: A): R = from(value).bind()
+  // TODO: This doesn't work for some weird reason :/
+  // fun Raise<E>.fromOrRaise(value: A): R = from(value).bind()
 
   fun fromOrNull(value: A): R? = from(value).getOrNull()
 
@@ -21,6 +21,7 @@ interface ExactEither<out E : Any, A, out R : Refined<A>> {
     is Either.Right -> result.value
   }
 
+  // TODO: What are your thoughts about this?
   operator fun invoke(value: A): R = fromOrThrow(value)
 }
 

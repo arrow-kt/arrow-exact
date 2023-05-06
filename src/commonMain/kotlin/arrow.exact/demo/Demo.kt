@@ -1,10 +1,13 @@
 package arrow.exact.demo
 
+import arrow.core.Either
+import arrow.core.raise.either
 import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
 import arrow.exact.*
 import kotlin.jvm.JvmInline
 
+// TODO: We need a lint check telling people to make their constructors private
 @JvmInline
 value class NotBlankTrimmedString private constructor(
   override val value: String
@@ -32,9 +35,14 @@ value class Username private constructor(
   })
 }
 
-fun main() {
+fun demo(): Either<String, NotBlankTrimmedString> = either {
   val hello = NotBlankTrimmedString("Hello")
   val world = NotBlankTrimmedString("World")
 
-  val helloWorld = NotBlankTrimmedString.fromOrNull(hello.value + " " + world.value)
+  val helloWorld = NotBlankTrimmedString.from(hello.value + " " + world.value)
+    .mapLeft { it.message }.bind()
+  val username = Username.from("user1")
+    .mapLeft { it.toString() }.bind()
+
+  hello
 }
