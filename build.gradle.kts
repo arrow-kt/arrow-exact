@@ -3,6 +3,7 @@ plugins {
   alias(libs.plugins.kotest.multiplatform)
   alias(libs.plugins.arrow.config.formatter)
   alias(libs.plugins.arrow.config.kotlin)
+  alias(libs.plugins.kotlinx.kover)
 }
 
 repositories {
