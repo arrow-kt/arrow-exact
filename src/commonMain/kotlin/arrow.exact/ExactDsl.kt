@@ -8,19 +8,15 @@ import arrow.core.raise.either
 annotation class ExactDsl
 
 @ExactDsl
-fun <A, R : Refined<A>> exact(
+fun <A, R> exact(
   construct: Raise<ExactError>.(A) -> R
 ): Exact<A, R> = object : Exact<A, R> {
   override fun from(value: A): Either<ExactError, R> = either { construct(value) }
 }
 
 @ExactDsl
-fun <E : Any, A, R : Refined<A>> exactEither(
+fun <E : Any, A, R> exactEither(
   construct: Raise<E>.(A) -> R
 ): ExactEither<E, A, R> = object : ExactEither<E, A, R> {
   override fun from(value: A): Either<E, R> = either { construct(value) }
 }
-
-// TODO: Add any relevant extensions to Refined<A>
-
-fun <A, B> Refined<A>.map(f: (A) -> B): B = f(value)

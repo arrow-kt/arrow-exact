@@ -12,8 +12,8 @@ import kotlin.random.Random
 // TODO: We need a lint check telling people to make their constructors private
 @JvmInline
 value class NotBlankString private constructor(
-  override val value: String
-) : Refined<String> {
+  val value: String
+) {
   companion object : Exact<String, NotBlankString> by exact({
     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
     NotBlankString(it)
@@ -23,8 +23,8 @@ value class NotBlankString private constructor(
 // TODO: We need a lint check telling people to make their constructors private
 @JvmInline
 value class NotBlankTrimmedString private constructor(
-  override val value: String
-) : Refined<String> {
+  val value: String
+) {
   companion object : Exact<String, NotBlankTrimmedString> by exact({ raw ->
     val notBlank = NotBlankString.from(raw).bind()
     NotBlankTrimmedString(notBlank.value.trim())
@@ -38,8 +38,8 @@ sealed interface UsernameError {
 
 @JvmInline
 value class Username private constructor(
-  override val value: String
-) : Refined<String> {
+  val value: String
+) {
   companion object : ExactEither<UsernameError, String, Username> by exactEither({ rawUsername ->
     val username = NotBlankTrimmedString.from(rawUsername) // compose Exact
       .mapLeft { UsernameError.Invalid }.bind().value
@@ -51,8 +51,8 @@ value class Username private constructor(
 
 @JvmInline
 value class PositiveInt private constructor(
-  override val value: Int
-) : Refined<Int> {
+  val value: Int
+) {
   companion object : Exact<Int, PositiveInt> by exact({
     ensure(it > 0) { ExactError("Must be positive.") }
     PositiveInt(it)

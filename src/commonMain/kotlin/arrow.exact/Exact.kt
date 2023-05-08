@@ -3,11 +3,11 @@ package arrow.exact
 import arrow.core.Either
 
 
-interface Exact<A, out R : Refined<A>> : ExactEither<ExactError, A, R>
+interface Exact<A, out R> : ExactEither<ExactError, A, R>
 
 data class ExactError(val message: String)
 
-interface ExactEither<out E : Any, A, out R : Refined<A>> {
+interface ExactEither<out E : Any, A, out R> {
 
   fun from(value: A): Either<E, R>
 
@@ -26,8 +26,3 @@ interface ExactEither<out E : Any, A, out R : Refined<A>> {
 }
 
 class ExactException(error: Any) : IllegalArgumentException("ArrowExact error: $error")
-
-interface Refined<A> {
-  val value: A
-}
-
