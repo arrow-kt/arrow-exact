@@ -1,0 +1,119 @@
+name: "pull_request"
+
+on: pull_request
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.kotlin.dsl.internal.io.timeout=120000 -Dorg.gradle.jvmargs="-Xmx5g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+
+concurrency:
+  group: pull_request-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios_watchos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: ios and watchos tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: iosSimulatorArm64Test iosX64Test watchosSimulatorArm64Test watchosX64Test watchosX86Test --parallel --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-ios_watchos'
+          path: '**/build/reports/**'
+
+  macos_tvos:
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: macos and tvos tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: macosArm64Test macosX64Test tvosSimulatorArm64Test tvosX64Test  --parallel  --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-macos_tvos'
+          path: '**/build/reports/**'
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: mingwX64Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: mingwX64Test  --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-windows'
+          path: '**/build/reports/**'
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build --scan
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'reports-jvmTest'
+          path: '**/build/reports/**'

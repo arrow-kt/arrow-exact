@@ -2,27 +2,21 @@ package arrow.exact
 
 import arrow.core.Either
 
+public interface Exact<A, out R> : ExactEither<ExactError, A, R>
 
-interface Exact<A, out R> : ExactEither<ExactError, A, R>
+public data class ExactError(val message: String)
 
-data class ExactError(val message: String)
+public interface ExactEither<out E : Any, A, out R> {
 
-interface ExactEither<out E : Any, A, out R> {
+  public fun from(value: A): Either<E, R>
 
-  fun from(value: A): Either<E, R>
+  public fun fromOrNull(value: A): R? = from(value).getOrNull()
 
-  // TODO: This doesn't work for some weird reason :/
-  // fun Raise<E>.fromOrRaise(value: A): R = from(value).bind()
-
-  fun fromOrNull(value: A): R? = from(value).getOrNull()
-
-  fun fromOrThrow(value: A): R = when (val result = from(value)) {
-    is Either.Left -> throw ExactException(result.value)
-    is Either.Right -> result.value
-  }
-
-  // TODO: What are your thoughts about this?
-  operator fun invoke(value: A): R = fromOrThrow(value)
+  public fun fromOrThrow(value: A): R =
+    when (val result = from(value)) {
+      is Either.Left -> throw ExactException(result.value)
+      is Either.Right -> result.value
+    }
 }
 
-class ExactException(error: Any) : IllegalArgumentException("ArrowExact error: $error")
+public class ExactException(error: Any) : IllegalArgumentException("ArrowExact error: $error")
