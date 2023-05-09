@@ -1,0 +1,31 @@
+// This file was automatically generated from ${file.name} by Knit tool. Do not edit.
+package ${test.package}
+
+import io.kotest.core.spec.style.StringSpec
+import kotlinx.knit.test.captureOutput
+import kotlinx.knit.test.verifyOutputLines
+
+class ${test.name} : StringSpec({
+<#list cases as case>
+  <#assign method = test["mode.${case.param}"]!"custom">
+  "${case.name}" {
+    <#if case.param == "assert">
+    ${case.knit.package}.${case.knit.name}.example()
+    <#else>
+    captureOutput("${case.name}") { ${case.knit.package}.${case.knit.name}.example() }
+    <#if method != "custom">
+      .${method}(
+        <#list case.lines as line>
+        "${line?j_string}"<#sep>,</#sep>
+        </#list>
+      )
+    <#else>
+      .also { lines -> check(${case.param}) }
+    </#if>
+    </#if>
+  }
+
+</#list>
+}) {
+  override fun timeout(): Long = 1000
+}
