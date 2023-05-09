@@ -1,9 +1,15 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+import kotlinx.knit.KnitPluginExtension
+
 plugins {
+  base
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.kotest.multiplatform)
-  alias(libs.plugins.arrow.config.formatter)
   alias(libs.plugins.arrow.config.kotlin)
-  alias(libs.plugins.kotlinx.kover)
+  alias(libs.plugins.arrow.config.publish)
+  alias(libs.plugins.arrow.config.nexus)
+  alias(libs.plugins.dokka)
+  alias(libs.plugins.kotlinx.knit)
 }
 
 repositories {
@@ -15,7 +21,7 @@ kotlin {
     commonMain {
       dependencies {
         implementation(libs.kotlin.stdlib)
-        implementation(libs.arrow.core)
+        api(libs.arrow.core)
       }
     }
 
@@ -32,7 +38,34 @@ kotlin {
     val jvmTest by getting {
       dependencies {
         implementation(libs.kotest.junit5)
+        implementation(libs.kotlinx.knit.test)
       }
     }
   }
+}
+
+//configure<KnitPluginExtension> {
+//  siteRoot = "https://arrow-kt.github.io/arrow-exact/"
+//}
+
+tasks {
+  afterEvaluate {
+    withType<DokkaTask>().configureEach {
+      outputDirectory.set(rootDir.resolve("docs"))
+      moduleName.set("Arrow Exact")
+      dokkaSourceSets {
+        named("commonMain") {
+          includes.from("README.md")
+          externalDocumentationLink("https://apidocs.arrow-kt.io")
+          sourceLink {
+            localDirectory.set(file("src/commonMain/kotlin"))
+            remoteUrl.set(uri("https://github.com/arrow-kt/arrow-exact/tree/main/src/commonMain/kotlin").toURL())
+            remoteLineSuffix.set("#L")
+          }
+        }
+      }
+    }
+  }
+
+  getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 }
