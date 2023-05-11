@@ -19,7 +19,7 @@ import arrow.core.raise.ensure
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString> by exact({ raw ->
+ *   companion object : Exact<String, NotBlankString> by exact({
  *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *     NotBlankString(raw)
  *   })
@@ -57,7 +57,7 @@ import arrow.core.raise.ensure
  * import arrow.exact.exact
  *
  * @JvmInline value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString> by exact({ raw ->
+ *   companion object : Exact<String, NotBlankString> by exact({
  *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *     NotBlankString(raw)
  *   })
@@ -66,8 +66,8 @@ import arrow.core.raise.ensure
  * ```kotlin
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString> by exact({ raw ->
- *     val notBlank = NotBlankString.from(raw).bind()
+ *   companion object : Exact<String, NotBlankTrimmedString> by exact({
+ *     val notBlank = ensure(NotBlankString)
  *     NotBlankTrimmedString(notBlank.value.trim())
  *   })
  * }
@@ -95,7 +95,7 @@ public data class ExactError(val message: String)
  * import arrow.exact.exactEither
  *
  * @JvmInline value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString> by exact({ raw ->
+ *   companion object : Exact<String, NotBlankTrimmedString> by exact({
  *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *     NotBlankTrimmedString(raw.trim())
  *   })
@@ -109,15 +109,14 @@ public data class ExactError(val message: String)
  *
  * @JvmInline
  * value class Username private constructor(val value: String) {
- *   companion object : ExactEither<UsernameError, String, Username> by exactEither({ rawUsername ->
- *       val username =
- *         NotBlankTrimmedString.from(rawUsername)
- *           .mapLeft { UsernameError.Invalid }
- *           .bind()
- *           .value
- *       ensure(username.length < 100) { UsernameError.Invalid }
- *       ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
- *       Username(username)
+ *   companion object : ExactEither<UsernameError, String, Username> by exactEither({
+ *     val username =
+ *       ensure(NotBlankTrimmedString) {
+ *         UsernameError.Invalid
+ *       }.value
+ *     ensure(username.length < 100) { UsernameError.Invalid }
+ *     ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
+ *     Username(username)
  *   })
  * }
  * ```
