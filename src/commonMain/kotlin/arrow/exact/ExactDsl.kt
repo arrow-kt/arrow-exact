@@ -18,9 +18,9 @@ public fun <E : Any, A, R> exactEither(construct: ExactScope<A, E>.() -> R): Exa
     override fun from(value: A): Either<E, R> = either { construct(ExactScope(value, this)) }
   }
 
-
 public class ExactScope<A, E : Any>(public val raw: A, private val raise: Raise<E>) : Raise<E> by raise {
 
+  @ExactDsl
   public fun <B> ensure(exact: ExactEither<E, A, B>): B {
     return when (val result = exact.from(raw)) {
       is Either.Left -> raise(result.value)
@@ -28,6 +28,7 @@ public class ExactScope<A, E : Any>(public val raw: A, private val raise: Raise<
     }
   }
 
+  @ExactDsl
   public fun <B> ensure(exact: Exact<A, B>, error: () -> E): B {
     return when (val result = exact.from(raw)) {
       is Either.Left -> raise(error())
