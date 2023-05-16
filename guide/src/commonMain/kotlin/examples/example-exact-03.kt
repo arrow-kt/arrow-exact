@@ -9,7 +9,7 @@ import arrow.exact.exact
 import arrow.exact.exactEither
 
 @JvmInline value class NotBlankTrimmedString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankTrimmedString> by exact({ raw ->
+  companion object : Exact<String, NotBlankTrimmedString> by exact({
     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
     NotBlankTrimmedString(raw.trim())
   })
@@ -22,14 +22,13 @@ sealed interface UsernameError {
 
 @JvmInline
 value class Username private constructor(val value: String) {
-  companion object : ExactEither<UsernameError, String, Username> by exactEither({ rawUsername ->
-      val username =
-        NotBlankTrimmedString.from(rawUsername)
-          .mapLeft { UsernameError.Invalid }
-          .bind()
-          .value
-      ensure(username.length < 100) { UsernameError.Invalid }
-      ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
-      Username(username)
+  companion object : ExactEither<UsernameError, String, Username> by exactEither({
+    val username =
+      ensure(NotBlankTrimmedString) {
+        UsernameError.Invalid
+      }.value
+    ensure(username.length < 100) { UsernameError.Invalid }
+    ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
+    Username(username)
   })
 }

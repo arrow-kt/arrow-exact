@@ -8,7 +8,7 @@ import arrow.exact.exact
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankString> by exact({ raw ->
+  companion object : Exact<String, NotBlankString> by exact({
     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
     NotBlankString(raw)
   })
