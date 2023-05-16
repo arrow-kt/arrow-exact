@@ -76,7 +76,7 @@ import arrow.core.raise.ensure
  *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
-public interface Exact<A, out R> : ExactEither<ExactError, A, R>
+public fun interface Exact<A, out R> : ExactEither<ExactError, A, R>
 
 // TODO: Should we just use `String` ???
 public data class ExactError(val message: String)
@@ -122,7 +122,7 @@ public data class ExactError(val message: String)
  * ```
  * <!--- KNIT example-exact-03.kt -->
  */
-public interface ExactEither<out E : Any, A, out R> {
+public fun interface ExactEither<out E : Any, A, out R> {
 
   public fun from(value: A): Either<E, R>
 

@@ -8,17 +8,13 @@ import arrow.core.raise.either
 
 @ExactDsl
 public fun <A, R> exact(construct: ExactScope<A, ExactError>.() -> R): Exact<A, R> =
-  object : Exact<A, R> {
-    override fun from(value: A): Either<ExactError, R> = either { construct(ExactScope(value, this)) }
-  }
+  Exact { value -> either { construct(ExactScope(value, this)) } }
 
 @ExactDsl
 public fun <E : Any, A, R> exactEither(construct: ExactScope<A, E>.() -> R): ExactEither<E, A, R> =
-  object : ExactEither<E, A, R> {
-    override fun from(value: A): Either<E, R> = either { construct(ExactScope(value, this)) }
-  }
+  ExactEither { value -> either { construct(ExactScope(value, this)) } }
 
-public class ExactScope<A, E : Any>(public val raw: A, private val raise: Raise<E>) : Raise<E> by raise {
+public class ExactScope<A, E : Any>(public val raw: A, raise: Raise<E>) : Raise<E> by raise {
 
   @ExactDsl
   public fun <B> ensure(exact: ExactEither<E, A, B>): B {
