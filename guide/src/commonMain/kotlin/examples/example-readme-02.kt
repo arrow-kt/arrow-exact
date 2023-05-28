@@ -20,9 +20,9 @@ value class NotBlankString private constructor(val value: String) {
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) { 
   companion object : Exact<String, NotBlankTrimmedString>() { 
-    override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
+    override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString { 
       ensure(raw, NotBlankString)
-        return NotBlankTrimmedString(raw.trim())
-      }
+      return NotBlankTrimmedString(raw.trim())
+    }
   }
 }

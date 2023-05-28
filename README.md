@@ -1,4 +1,4 @@
-Module Arrow Exact
+# Arrow Exact
 
 Arrow Exact allows you to use Kotlin's type system to enforce exactness of data structures.
 
@@ -21,8 +21,8 @@ value class NotBlankString private constructor(val value: String) {
   companion object : Exact<String, NotBlankString>() {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString { 
       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
-        return NotBlankString(raw)
-      }
+      return NotBlankString(raw)
+    }
   }
 }
 ```
@@ -75,10 +75,10 @@ value class NotBlankString private constructor(val value: String) {
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) { 
   companion object : Exact<String, NotBlankTrimmedString>() { 
-    override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
+    override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString { 
       ensure(raw, NotBlankString)
-        return NotBlankTrimmedString(raw.trim())
-      }
+      return NotBlankTrimmedString(raw.trim())
+    }
   }
 }
 ```
