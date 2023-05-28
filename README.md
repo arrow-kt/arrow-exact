@@ -50,6 +50,23 @@ Either.Left(ExactError(message=Cannot be blank.))
 <!--- KNIT example-readme-01.kt -->
 <!--- TEST -->
 
+You can also define `Exact` by using Kotlin delegation.
+<!--- INCLUDE
+import arrow.core.raise.ensure
+import arrow.exact.Exact
+import arrow.exact.ExactError
+-->
+```kotlin
+@JvmInline
+value class NotBlankString private constructor(val value: String) {
+   companion object : Exact<String, NotBlankString> by Exact({
+     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+     NotBlankString(it)
+   })
+}
+```
+<!--- KNIT example-readme-02.kt -->
+
 You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
 trimmed. Since the `ensure` allows us to compose `Exact` instances, we can easily
 reuse the `NotBlankString` type.
@@ -83,21 +100,4 @@ value class NotBlankTrimmedString private constructor(val value: String) {
 }
 ```
 
-<!--- KNIT example-readme-02.kt -->
-
-You can also define `Exact` by using Kotlin delegation
-<!--- INCLUDE
-import arrow.core.raise.ensure
-import arrow.exact.Exact
-import arrow.exact.ExactError
--->
-```kotlin
-@JvmInline
-value class NotBlankString private constructor(val value: String) {
-   companion object : Exact<String, NotBlankString> by Exact({
-     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
-     NotBlankString(it)
-   })
-}
-```
 <!--- KNIT example-readme-03.kt -->

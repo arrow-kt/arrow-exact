@@ -50,8 +50,25 @@ import arrow.core.raise.ensure
  * <!--- KNIT example-exact-01.kt -->
  * <!--- TEST -->
  *
+ * You can also define [Exact] by using Kotlin delegation.
+ * <!--- INCLUDE
+ * import arrow.core.raise.ensure
+ * import arrow.exact.Exact
+ * import arrow.exact.ExactError
+ * -->
+ * ```kotlin
+ * @JvmInline
+ * value class NotBlankString private constructor(val value: String) {
+ *   companion object : Exact<String, NotBlankString> by Exact({
+ *     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+ *     NotBlankString(it)
+ *   })
+ * }
+ * ```
+ * <!--- KNIT example-exact-02.kt -->
+ *
  * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
- * trimmed. Since the `ensure` constructor allows us to compose `Exact` instances, we can easily
+ * trimmed. Since the [ensure] allows us to compose [Exact] instances, we can easily
  * reuse the `NotBlankString` type.
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
@@ -81,28 +98,11 @@ import arrow.core.raise.ensure
  *   }
  * }
  * ```
- * <!--- KNIT example-exact-02.kt -->
- *
- * You can also define [Exact] by using Kotlin delegation
- * <!--- INCLUDE
- * import arrow.core.raise.ensure
- * import arrow.exact.Exact
- * import arrow.exact.ExactError
- * -->
- * ```kotlin
- * @JvmInline
- * value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString> by Exact({
- *     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
- *     NotBlankString(it)
- *   })
- * }
- * ```
  * <!--- KNIT example-exact-03.kt -->
  *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
-public fun interface Exact<A, out B> : ExactEither<ExactError, A, B>
+public fun interface Exact<A, out R> : ExactEither<ExactError, A, R>
 
 // TODO: Should we just use `String` ???
 public data class ExactError(val message: String)
