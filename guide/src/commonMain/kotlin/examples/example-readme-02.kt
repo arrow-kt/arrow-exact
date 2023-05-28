@@ -9,7 +9,7 @@ import arrow.exact.ensure
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankString>() {
+  companion object : Exact<String, NotBlankString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
       return NotBlankString(raw)
@@ -19,7 +19,7 @@ value class NotBlankString private constructor(val value: String) {
 
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) { 
-  companion object : Exact<String, NotBlankTrimmedString>() { 
+  companion object : Exact<String, NotBlankTrimmedString> { 
     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString { 
       ensure(raw, NotBlankString)
       return NotBlankTrimmedString(raw.trim())

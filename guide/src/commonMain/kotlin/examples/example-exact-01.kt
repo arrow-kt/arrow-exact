@@ -8,7 +8,7 @@ import arrow.exact.ExactError
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankString>() {
+  companion object : Exact<String, NotBlankString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
       return NotBlankString(raw)

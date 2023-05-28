@@ -20,7 +20,7 @@ import arrow.core.raise.ensure
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString>() {
+ *   companion object : Exact<String, NotBlankString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
  *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *       return NotBlankString(raw)
@@ -51,7 +51,7 @@ import arrow.core.raise.ensure
  * <!--- TEST -->
  *
  * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
- * trimmed. Since the `exact` constructor allows us to compose `Exact` instances, we can easily
+ * trimmed. Since the `ensure` constructor allows us to compose `Exact` instances, we can easily
  * reuse the `NotBlankString` type.
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
@@ -62,7 +62,7 @@ import arrow.core.raise.ensure
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString>() {
+ *   companion object : Exact<String, NotBlankString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
  *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *       return NotBlankString(raw)
@@ -73,7 +73,7 @@ import arrow.core.raise.ensure
  * ```kotlin
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString>() {
+ *   companion object : Exact<String, NotBlankTrimmedString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
  *       ensure(raw, NotBlankString)
  *       return NotBlankTrimmedString(raw.trim())
@@ -83,9 +83,26 @@ import arrow.core.raise.ensure
  * ```
  * <!--- KNIT example-exact-02.kt -->
  *
+ * You can also define [Exact] by using Kotlin delegation
+ * <!--- INCLUDE
+ * import arrow.core.raise.ensure
+ * import arrow.exact.Exact
+ * import arrow.exact.ExactError
+ * -->
+ * ```kotlin
+ * @JvmInline
+ * value class NotBlankString private constructor(val value: String) {
+ *   companion object : Exact<String, NotBlankString> by Exact({
+ *     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+ *     NotBlankString(it)
+ *   })
+ * }
+ * ```
+ * <!--- KNIT example-exact-03.kt -->
+ *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
-public abstract class Exact<A, out B> : ExactEither<ExactError, A, B>()
+public fun interface Exact<A, out B> : ExactEither<ExactError, A, B>
 
 // TODO: Should we just use `String` ???
 public data class ExactError(val message: String)
@@ -105,7 +122,7 @@ public data class ExactError(val message: String)
  *
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString>() {
+ *   companion object : Exact<String, NotBlankTrimmedString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
  *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
  *       return NotBlankTrimmedString(raw.trim())
@@ -121,7 +138,7 @@ public data class ExactError(val message: String)
  *
  * @JvmInline
  * value class Username private constructor(val value: String) {
- *   companion object : ExactEither<UsernameError, String, Username>() {
+ *   companion object : ExactEither<UsernameError, String, Username> {
  *     override fun Raise<UsernameError>.spec(raw: String): Username {
  *       val username =
  *         ensure(raw, NotBlankTrimmedString) {
@@ -134,11 +151,11 @@ public data class ExactError(val message: String)
  *   }
  * }
  * ```
- * <!--- KNIT example-exact-03.kt -->
+ * <!--- KNIT example-exact-04.kt -->
  */
-public abstract class ExactEither<E : Any, A, out R> {
+public fun interface ExactEither<E : Any, A, out R> {
 
-  protected abstract fun Raise<E>.spec(raw: A): R
+  public fun Raise<E>.spec(raw: A): R
 
   public fun from(value: A): Either<E, R> = either { spec(value) }
 

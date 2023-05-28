@@ -18,7 +18,7 @@ import arrow.exact.ExactError
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) { 
-  companion object : Exact<String, NotBlankString>() {
+  companion object : Exact<String, NotBlankString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString { 
       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
       return NotBlankString(raw)
@@ -51,7 +51,7 @@ Either.Left(ExactError(message=Cannot be blank.))
 <!--- TEST -->
 
 You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
-trimmed. Since the `exact` constructor allows us to compose `Exact` instances, we can easily
+trimmed. Since the `ensure` allows us to compose `Exact` instances, we can easily
 reuse the `NotBlankString` type.
 <!--- INCLUDE
 import arrow.core.raise.Raise
@@ -62,7 +62,7 @@ import arrow.exact.ensure
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
-  companion object : Exact<String, NotBlankString>() {
+  companion object : Exact<String, NotBlankString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
       return NotBlankString(raw)
@@ -74,7 +74,7 @@ value class NotBlankString private constructor(val value: String) {
 ```kotlin
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) { 
-  companion object : Exact<String, NotBlankTrimmedString>() { 
+  companion object : Exact<String, NotBlankTrimmedString> { 
     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString { 
       ensure(raw, NotBlankString)
       return NotBlankTrimmedString(raw.trim())
@@ -84,3 +84,20 @@ value class NotBlankTrimmedString private constructor(val value: String) {
 ```
 
 <!--- KNIT example-readme-02.kt -->
+
+You can also define `Exact` by using Kotlin delegation
+<!--- INCLUDE
+import arrow.core.raise.ensure
+import arrow.exact.Exact
+import arrow.exact.ExactError
+-->
+```kotlin
+@JvmInline
+value class NotBlankString private constructor(val value: String) {
+   companion object : Exact<String, NotBlankString> by Exact({
+     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+     NotBlankString(it)
+   })
+}
+```
+<!--- KNIT example-readme-03.kt -->
