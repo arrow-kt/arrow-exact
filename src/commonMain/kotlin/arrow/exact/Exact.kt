@@ -2,6 +2,7 @@ package arrow.exact
 
 import arrow.core.Either
 import arrow.core.raise.Raise
+import arrow.core.raise.either
 import arrow.core.raise.ensure
 
 /**
@@ -12,17 +13,19 @@ import arrow.core.raise.ensure
  * the Arrow's [Raise] DSL to [ensure] the value is not blank.
  *
  * ```kotlin
+ * import arrow.core.raise.Raise
  * import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
- * import arrow.exact.exact
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString> by exact({
- *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
- *     NotBlankString(raw)
- *   })
+ *   companion object : Exact<String, NotBlankString> {
+ *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
+ *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       return NotBlankString(raw)
+ *     }
+ *   }
  * }
  * ```
  *
@@ -47,32 +50,54 @@ import arrow.core.raise.ensure
  * <!--- KNIT example-exact-01.kt -->
  * <!--- TEST -->
  *
- * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
- * trimmed. Since the `exact` constructor allows us to compose `Exact` instances, we can easily
- * reuse the `NotBlankString` type.
+ * You can also define [Exact] by using Kotlin delegation.
  * <!--- INCLUDE
  * import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
- * import arrow.exact.exact
- *
- * @JvmInline value class NotBlankString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankString> by exact({
- *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
- *     NotBlankString(raw)
+ * -->
+ * ```kotlin
+ * @JvmInline
+ * value class NotBlankString private constructor(val value: String) {
+ *   companion object : Exact<String, NotBlankString> by Exact({
+ *     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+ *     NotBlankString(it)
  *   })
+ * }
+ * ```
+ * <!--- KNIT example-exact-02.kt -->
+ *
+ * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
+ * trimmed. Since the [ensure] allows us to compose [Exact] instances, we can easily
+ * reuse the `NotBlankString` type.
+ * <!--- INCLUDE
+ * import arrow.core.raise.Raise
+ * import arrow.core.raise.ensure
+ * import arrow.exact.Exact
+ * import arrow.exact.ExactError
+ * import arrow.exact.ensure
+ *
+ * class NotBlankString private constructor(val value: String) {
+ *   companion object : Exact<String, NotBlankString> {
+ *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
+ *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       return NotBlankString(raw)
+ *     }
+ *   }
  * }
  * -->
  * ```kotlin
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString> by exact({
- *     val notBlank = ensure(NotBlankString)
- *     NotBlankTrimmedString(notBlank.value.trim())
- *   })
+ *   companion object : Exact<String, NotBlankTrimmedString> {
+ *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
+ *       ensure(raw, NotBlankString)
+ *       return NotBlankTrimmedString(raw.trim())
+ *     }
+ *   }
  * }
  * ```
- * <!--- KNIT example-exact-02.kt -->
+ * <!--- KNIT example-exact-03.kt -->
  *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
@@ -87,18 +112,21 @@ public data class ExactError(val message: String)
  * [ExactError], we can easily combine the two by mapping from [ExactError] to our custom [E] type.
  *
  * <!--- INCLUDE
+ * import arrow.core.raise.Raise
  * import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactEither
  * import arrow.exact.ExactError
- * import arrow.exact.exact
- * import arrow.exact.exactEither
+ * import arrow.exact.ensure
  *
- * @JvmInline value class NotBlankTrimmedString private constructor(val value: String) {
- *   companion object : Exact<String, NotBlankTrimmedString> by exact({
- *     ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
- *     NotBlankTrimmedString(raw.trim())
- *   })
+ * @JvmInline
+ * value class NotBlankTrimmedString private constructor(val value: String) {
+ *   companion object : Exact<String, NotBlankTrimmedString> {
+ *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
+ *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       return NotBlankTrimmedString(raw.trim())
+ *     }
+ *   }
  * }
  * -->
  * ```kotlin
@@ -109,22 +137,26 @@ public data class ExactError(val message: String)
  *
  * @JvmInline
  * value class Username private constructor(val value: String) {
- *   companion object : ExactEither<UsernameError, String, Username> by exactEither({
- *     val username =
- *       ensure(NotBlankTrimmedString) {
- *         UsernameError.Invalid
- *       }.value
- *     ensure(username.length < 100) { UsernameError.Invalid }
- *     ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
- *     Username(username)
- *   })
+ *   companion object : ExactEither<UsernameError, String, Username> {
+ *     override fun Raise<UsernameError>.spec(raw: String): Username {
+ *       val username =
+ *         ensure(raw, NotBlankTrimmedString) {
+ *           UsernameError.Invalid
+ *         }.value
+ *       ensure(username.length < 100) { UsernameError.Invalid }
+ *       ensure(username !in listOf("offensive")) { UsernameError.Offensive(username) }
+ *       return Username(username)
+ *     }
+ *   }
  * }
  * ```
- * <!--- KNIT example-exact-03.kt -->
+ * <!--- KNIT example-exact-04.kt -->
  */
-public fun interface ExactEither<out E : Any, A, out R> {
+public fun interface ExactEither<E : Any, A, out R> {
 
-  public fun from(value: A): Either<E, R>
+  public fun Raise<E>.spec(raw: A): R
+
+  public fun from(value: A): Either<E, R> = either { spec(value) }
 
   public fun fromOrNull(value: A): R? = from(value).getOrNull()
 
