@@ -13,9 +13,9 @@ public inline fun <A, B, Error : Any> Raise<Error>.ensure(raw: A, exact: ExactEi
 }
 
 @RaiseDSL
-public inline fun <A, B, Error> Raise<Error>.ensure(raw: A, exact: Exact<A, B>, error: () -> Error): B {
+public inline fun <A, B, Error> Raise<Error>.ensure(raw: A, exact: Exact<A, B>, error: (ExactError) -> Error): B {
   return when (val result = exact.from(raw)) {
-    is Either.Left -> raise(error())
+    is Either.Left -> raise(error(result.value))
     is Either.Right -> result.value
   }
 }
