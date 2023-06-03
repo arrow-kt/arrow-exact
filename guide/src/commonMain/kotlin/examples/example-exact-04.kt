@@ -7,12 +7,13 @@ import arrow.exact.Exact
 import arrow.exact.ExactEither
 import arrow.exact.ExactError
 import arrow.exact.ensure
+import arrow.exact.ensureExact
 
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) {
   companion object : Exact<String, NotBlankTrimmedString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
-      ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+      ensure(raw.isNotBlank())
       return NotBlankTrimmedString(raw.trim())
     }
   }
@@ -28,7 +29,7 @@ value class Username private constructor(val value: String) {
   companion object : ExactEither<UsernameError, String, Username> {
     override fun Raise<UsernameError>.spec(raw: String): Username {
       val username =
-        ensure(raw, NotBlankTrimmedString) {
+        ensureExact(raw, NotBlankTrimmedString) {
           UsernameError.Invalid
         }.value
       ensure(username.length < 100) { UsernameError.Invalid }

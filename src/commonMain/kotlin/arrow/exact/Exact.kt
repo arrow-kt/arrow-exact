@@ -14,15 +14,15 @@ import arrow.core.raise.ensure
  *
  * ```kotlin
  * import arrow.core.raise.Raise
- * import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
+ * import arrow.exact.ensure
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
- *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       ensure(raw.isNotBlank())
  *       return NotBlankString(raw)
  *     }
  *   }
@@ -45,22 +45,21 @@ import arrow.core.raise.ensure
  * The output of the above program is:
  * ```text
  * Either.Right(NotBlankString(value=Hello))
- * Either.Left(ExactError(message=Cannot be blank.))
+ * Either.Left(ExactError(message=Failed condition.))
  * ```
  * <!--- KNIT example-exact-01.kt -->
  * <!--- TEST -->
  *
  * You can also define [Exact] by using Kotlin delegation.
  * <!--- INCLUDE
- * import arrow.core.raise.ensure
  * import arrow.exact.Exact
- * import arrow.exact.ExactError
+ * import arrow.exact.ensure
  * -->
  * ```kotlin
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankString> by Exact({
- *     ensure(it.isNotBlank()) { ExactError("Cannot be blank.") }
+ *     ensure(it.isNotBlank())
  *     NotBlankString(it)
  *   })
  * }
@@ -68,19 +67,19 @@ import arrow.core.raise.ensure
  * <!--- KNIT example-exact-02.kt -->
  *
  * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
- * trimmed. Since the [ensure] allows us to compose [Exact] instances, we can easily
+ * trimmed. [ensureExact] allows us to compose [Exact] instances and easily
  * reuse the `NotBlankString` type.
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
- * import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
+ * import arrow.exact.ensureExact
  *
  * class NotBlankString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
- *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       ensure(raw.isNotBlank())
  *       return NotBlankString(raw)
  *     }
  *   }
@@ -91,7 +90,7 @@ import arrow.core.raise.ensure
  * value class NotBlankTrimmedString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankTrimmedString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
- *       ensure(raw, NotBlankString)
+ *       ensureExact(raw, NotBlankString)
  *       return NotBlankTrimmedString(raw.trim())
  *     }
  *   }
@@ -118,12 +117,13 @@ public data class ExactError(val message: String)
  * import arrow.exact.ExactEither
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
+ * import arrow.exact.ensureExact
  *
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankTrimmedString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
- *       ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+ *       ensure(raw.isNotBlank())
  *       return NotBlankTrimmedString(raw.trim())
  *     }
  *   }
@@ -140,7 +140,7 @@ public data class ExactError(val message: String)
  *   companion object : ExactEither<UsernameError, String, Username> {
  *     override fun Raise<UsernameError>.spec(raw: String): Username {
  *       val username =
- *         ensure(raw, NotBlankTrimmedString) {
+ *         ensureExact(raw, NotBlankTrimmedString) {
  *           UsernameError.Invalid
  *         }.value
  *       ensure(username.length < 100) { UsernameError.Invalid }
