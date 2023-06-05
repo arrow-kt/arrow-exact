@@ -69,3 +69,7 @@ tasks {
 
   getByName("knitPrepare").dependsOn(getTasksByName("dokka", true))
 }
+
+tasks.withType<AbstractPublishToMaven> {
+  dependsOn(tasks.withType<Sign>())
+}
