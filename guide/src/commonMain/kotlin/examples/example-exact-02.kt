@@ -3,6 +3,7 @@ package arrow.exact.knit.example.exampleExact02
 
 import arrow.exact.Exact
 import arrow.exact.ensure
+import kotlin.jvm.JvmInline
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {

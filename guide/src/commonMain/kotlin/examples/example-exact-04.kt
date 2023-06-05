@@ -7,6 +7,7 @@ import arrow.exact.Exact
 import arrow.exact.ExactEither
 import arrow.exact.ExactError
 import arrow.exact.ensure
+import kotlin.jvm.JvmInline
 
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) {

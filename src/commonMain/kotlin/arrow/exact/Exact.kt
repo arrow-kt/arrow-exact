@@ -17,6 +17,7 @@ import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
+ * import kotlin.jvm.JvmInline
  *
  * @JvmInline
  * value class NotBlankString private constructor(val value: String) {
@@ -54,6 +55,7 @@ import arrow.core.raise.ensure
  * <!--- INCLUDE
  * import arrow.exact.Exact
  * import arrow.exact.ensure
+ * import kotlin.jvm.JvmInline
  * -->
  * ```kotlin
  * @JvmInline
@@ -74,6 +76,7 @@ import arrow.core.raise.ensure
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
+ * import kotlin.jvm.JvmInline
  *
  * class NotBlankString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankString> {
@@ -116,6 +119,7 @@ public data class ExactError(val message: String)
  * import arrow.exact.ExactEither
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
+ * import kotlin.jvm.JvmInline
  *
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {

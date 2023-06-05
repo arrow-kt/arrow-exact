@@ -15,6 +15,7 @@ import arrow.core.raise.Raise
 import arrow.exact.Exact
 import arrow.exact.ExactError
 import arrow.exact.ensure
+import kotlin.jvm.JvmInline
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) { 
@@ -54,6 +55,7 @@ You can also define `Exact` by using Kotlin delegation.
 <!--- INCLUDE
 import arrow.exact.Exact
 import arrow.exact.ensure
+import kotlin.jvm.JvmInline
 -->
 ```kotlin
 @JvmInline
@@ -74,6 +76,7 @@ import arrow.core.raise.Raise
 import arrow.exact.Exact
 import arrow.exact.ExactError
 import arrow.exact.ensure
+import kotlin.jvm.JvmInline
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
