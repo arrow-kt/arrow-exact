@@ -1,4 +1,4 @@
-# Arrow Exact
+Module Arrow Exact
 
 Arrow Exact allows you to use Kotlin's type system to enforce exactness of data structures.
 

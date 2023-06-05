@@ -44,9 +44,9 @@ kotlin {
   }
 }
 
-//configure<KnitPluginExtension> {
-//  siteRoot = "https://arrow-kt.github.io/arrow-exact/"
-//}
+configure<KnitPluginExtension> {
+  siteRoot = "https://arrow-kt.github.io/arrow-exact/"
+}
 
 tasks {
   afterEvaluate {
