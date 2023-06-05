@@ -67,14 +67,13 @@ import arrow.core.raise.ensure
  * <!--- KNIT example-exact-02.kt -->
  *
  * You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
- * trimmed. [ensureExact] allows us to compose [Exact] instances and easily
+ * trimmed. [ensure] allows us to compose [Exact] instances and easily
  * reuse the `NotBlankString` type.
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
  * import arrow.exact.Exact
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
- * import arrow.exact.ensureExact
  *
  * class NotBlankString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankString> {
@@ -90,7 +89,7 @@ import arrow.core.raise.ensure
  * value class NotBlankTrimmedString private constructor(val value: String) {
  *   companion object : Exact<String, NotBlankTrimmedString> {
  *     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
- *       ensureExact(raw, NotBlankString)
+ *       ensure(raw, NotBlankString)
  *       return NotBlankTrimmedString(raw.trim())
  *     }
  *   }
@@ -117,7 +116,6 @@ public data class ExactError(val message: String)
  * import arrow.exact.ExactEither
  * import arrow.exact.ExactError
  * import arrow.exact.ensure
- * import arrow.exact.ensureExact
  *
  * @JvmInline
  * value class NotBlankTrimmedString private constructor(val value: String) {
@@ -140,7 +138,7 @@ public data class ExactError(val message: String)
  *   companion object : ExactEither<UsernameError, String, Username> {
  *     override fun Raise<UsernameError>.spec(raw: String): Username {
  *       val username =
- *         ensureExact(raw, NotBlankTrimmedString) {
+ *         ensure(raw, NotBlankTrimmedString) {
  *           UsernameError.Invalid
  *         }.value
  *       ensure(username.length < 100) { UsernameError.Invalid }
