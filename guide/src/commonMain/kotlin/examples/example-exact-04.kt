@@ -12,7 +12,7 @@ import arrow.exact.ensure
 value class NotBlankTrimmedString private constructor(val value: String) {
   companion object : Exact<String, NotBlankTrimmedString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString {
-      ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+      ensure(raw.isNotBlank())
       return NotBlankTrimmedString(raw.trim())
     }
   }

@@ -10,7 +10,7 @@ class ExactExampleSpec : StringSpec({
     captureOutput("ExampleExact01") { arrow.exact.knit.example.exampleExact01.example() }
       .verifyOutputLines(
         "Either.Right(NotBlankString(value=Hello))",
-        "Either.Left(ExactError(message=Cannot be blank.))"
+        "Either.Left(ExactError(message=Failed condition.))"
       )
   }
 

@@ -2,7 +2,6 @@
 package arrow.exact.knit.example.exampleExact03
 
 import arrow.core.raise.Raise
-import arrow.core.raise.ensure
 import arrow.exact.Exact
 import arrow.exact.ExactError
 import arrow.exact.ensure
@@ -10,7 +9,7 @@ import arrow.exact.ensure
 class NotBlankString private constructor(val value: String) {
   companion object : Exact<String, NotBlankString> {
     override fun Raise<ExactError>.spec(raw: String): NotBlankString {
-      ensure(raw.isNotBlank()) { ExactError("Cannot be blank.") }
+      ensure(raw.isNotBlank())
       return NotBlankString(raw)
     }
   }
