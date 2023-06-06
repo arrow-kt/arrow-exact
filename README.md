@@ -27,7 +27,7 @@ implementation 'io.arrow-kt:arrow-exact-jvm:0.1.0'
 
 <!--- TEST_NAME ReadMeSpec -->
 
-Exact allows automatically projecting smart-constructors on a `Companion Object`. We can for
+Exact allows automatically projecting smart-constructors on a `companion object`. We can for
 example easily create a `NotBlankString` type that is a `String` that is not blank, leveraging
 the Arrow's `Raise` DSL to `ensure` the value is not blank.
 
