@@ -5,20 +5,20 @@ import arrow.core.raise.Raise
 import arrow.core.raise.RaiseDSL
 
 @RaiseDSL
-public inline fun Raise<ExactError>.ensure(condition: Boolean) {
-  if (!condition) raise(ExactError("Failed condition."))
+public inline fun Raise<String>.ensure(condition: Boolean) {
+  if (!condition) raise("Failed condition.")
 }
 
 @RaiseDSL
-public inline fun <A, B> Raise<ExactError>.ensure(raw: A, exact: Exact<A, B>): B = ensure(raw, exact as ExactEither<*, A, B>)
+public inline fun <A, B> Raise<String>.ensure(raw: A, exact: Exact<A, B>): B = ensure(raw, exact as ExactEither<*, A, B>)
 
 @RaiseDSL
-public inline fun <A, B> Raise<ExactError>.ensure(raw: A, exact: ExactEither<*, A, B>): B =
-  ensure(raw, exact) { ExactError("Failed to match Exact.") }
+public inline fun <A, B> Raise<String>.ensure(raw: A, exact: ExactEither<*, A, B>): B =
+  ensure(raw, exact) { "Failed to match Exact." }
 
 @RaiseDSL
-public inline fun <A, B, Error : Any> Raise<Error>.ensure(raw: A, exact: Exact<A, B>, error: (ExactError) -> Error): B =
-  ensure(raw, exact as ExactEither<ExactError, A, B>, error)
+public inline fun <A, B, Error : Any> Raise<Error>.ensure(raw: A, exact: Exact<A, B>, error: (String) -> Error): B =
+  ensure(raw, exact as ExactEither<String, A, B>, error)
 
 @RaiseDSL
 public inline fun <A, B, Error : Any, E : Any> Raise<E>.ensure(raw: A, exact: ExactEither<Error, A, B>, error: (Error) -> E): B {
