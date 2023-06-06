@@ -1,6 +1,27 @@
-Module Arrow Exact
+# Arrow Exact
 
-Arrow Exact allows you to use Kotlin's type system to enforce exactness of data structures.
+Arrow Exact allows you to use Kotlin's type system to enforce **exactness of data structures.**
+If you're practicing [Domain-driven Design (DDD)](https://en.wikipedia.org/wiki/Domain-driven_design) Arrow Exact will be
+your trusted companion and help you easily create your own constrained (refined) types for example like `NotBlankString`, `PositiveInt`, `OrderId` 
+that explicitly describe your domain model.
+
+See this article on [functional domain modeling](https://arrow-kt.io/learn/design/domain-modeling/) to learn more.
+
+## Quickstart
+
+[![Latest Version](https://img.shields.io/github/v/release/arrow-kt/arrow-exact)](https://github.com/arrow-kt/arrow-exact/releases/latest)
+
+It's easy! Just put this in your module's `build.gradle` file.
+
+**build.gradle.kts** _(Gradle Kotlin DSL)_
+```kotlin
+implementation("io.arrow-kt:arrow-exact-jvm:0.1.0")
+```
+
+**build.gradle** _(Gradle Groovy)_
+```groovy
+implementation 'io.arrow-kt:arrow-exact-jvm:0.1.0'
+```
 
 ## Introduction
 
