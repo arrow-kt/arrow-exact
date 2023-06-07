@@ -29,9 +29,9 @@ import arrow.core.raise.ensure
  * }
  * ```
  *
- * We can then easily create values of `NotBlankString` [from] a `String`, which returns us a
- * [Either] with the [String] or the `NotBlankString`. We can also use [fromOrNull] to get a
- * nullable value, or [fromOrThrow] to throw an [ExactException].
+ * We can then easily create values of `NotBlankString` [ExactEither.from] a `String`, which returns us a
+ * [Either] with the [String] or the `NotBlankString`. We can also use [ExactEither.fromOrNull] to get a
+ * nullable value, or [ExactEither.fromOrThrow] to throw an [ExactException].
  *
  * **note:** Make sure to define your constructor as `private` to prevent creating invalid values.
  *
@@ -133,12 +133,12 @@ import arrow.core.raise.ensure
  *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
-public fun interface Exact<A, out R> : ExactEither<String, A, R>
+public typealias Exact<A, R> = ExactEither<String, A, R>
 
 /**
- * A more generic version of [Exact] that allows working over a custom error type rather than
- * [String]. Since [Exact] is a specialization of [ExactEither], where [E] is fixed to
- * [String], we can easily combine the two by mapping from [String] to our custom [E] type.
+ * Input more generic version of [Exact] that allows working over a custom error type rather than
+ * [String]. Since [Exact] is a specialization of [ExactEither], where [Error] is fixed to
+ * [String], we can easily combine the two by mapping from [String] to our custom [Error] type.
  *
  * <!--- INCLUDE
  * import arrow.core.raise.Raise
@@ -181,15 +181,15 @@ public fun interface Exact<A, out R> : ExactEither<String, A, R>
  * ```
  * <!--- KNIT example-exact-05.kt -->
  */
-public fun interface ExactEither<E : Any, A, out R> {
+public fun interface ExactEither<out Error : Any, in Input, out Output> {
 
-  public fun Raise<E>.spec(raw: A): R
+  public fun Raise<Error>.spec(raw: Input): Output
 
-  public fun from(value: A): Either<E, R> = either { spec(value) }
+  public fun from(value: Input): Either<Error, Output> = either { spec(value) }
 
-  public fun fromOrNull(value: A): R? = from(value).getOrNull()
+  public fun fromOrNull(value: Input): Output? = from(value).getOrNull()
 
-  public fun fromOrThrow(value: A): R =
+  public fun fromOrThrow(value: Input): Output =
     when (val result = from(value)) {
       is Either.Left -> throw ExactException(result.value)
       is Either.Right -> result.value
