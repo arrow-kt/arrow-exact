@@ -10,17 +10,17 @@ Exact allows automatically projecting smart-constructors on a `Companion Object`
 example easily create a `NotBlankString` type that is a `String` that is not blank, leveraging
 the Arrow's `Raise` DSL to `ensure` the value is not blank.
 
-```kotlin
+<!--- INCLUDE
 import arrow.core.raise.Raise
 import arrow.exact.Exact
-import arrow.exact.ExactError
 import arrow.exact.ensure
 import kotlin.jvm.JvmInline
-
+-->
+```kotlin
 @JvmInline
 value class NotBlankString private constructor(val value: String) { 
   companion object : Exact<String, NotBlankString> {
-    override fun Raise<ExactError>.spec(raw: String): NotBlankString { 
+    override fun Raise<String>.spec(raw: String): NotBlankString { 
       ensure(raw.isNotBlank())
       return NotBlankString(raw)
     }
@@ -45,10 +45,44 @@ The output of the above program is:
 
 ```text
 Either.Right(NotBlankString(value=Hello))
-Either.Left(ExactError(message=Failed condition.))
+Either.Left(Failed condition.)
 ```
 
 <!--- KNIT example-readme-01.kt -->
+<!--- TEST -->
+
+By default, if no error message is provided it'll use `Failed condition.`,
+but just like `require` from the Kotlin Standard Library you can provide your own error message.
+
+<!--- INCLUDE
+import arrow.core.raise.Raise
+import arrow.exact.Exact
+import arrow.core.raise.ensure
+import kotlin.jvm.JvmInline
+-->
+```kotlin
+@JvmInline
+value class NotBlankString private constructor(val value: String) { 
+  companion object : Exact<String, NotBlankString> {
+    override fun Raise<String>.spec(raw: String): NotBlankString { 
+      ensure(raw.isNotBlank()) { "String must not be blank." }
+      return NotBlankString(raw)
+    }
+  }
+}
+
+fun example() {
+  println(NotBlankString.from(""))
+}
+```
+
+The output of the above program is:
+
+```text
+Either.Left(String must not be blank.)
+```
+
+<!--- KNIT example-readme-02.kt -->
 <!--- TEST -->
 
 You can also define `Exact` by using Kotlin delegation.
@@ -66,7 +100,7 @@ value class NotBlankString private constructor(val value: String) {
    })
 }
 ```
-<!--- KNIT example-readme-02.kt -->
+<!--- KNIT example-readme-03.kt -->
 
 You can define a second type `NotBlankTrimmedString` that is a `NotBlankString` that is also
 trimmed. `ensureExact` allows us to compose `Exact` instances and easily
@@ -74,14 +108,13 @@ reuse the `NotBlankString` type.
 <!--- INCLUDE
 import arrow.core.raise.Raise
 import arrow.exact.Exact
-import arrow.exact.ExactError
 import arrow.exact.ensure
 import kotlin.jvm.JvmInline
 
 @JvmInline
 value class NotBlankString private constructor(val value: String) {
   companion object : Exact<String, NotBlankString> {
-    override fun Raise<ExactError>.spec(raw: String): NotBlankString {
+    override fun Raise<String>.spec(raw: String): NotBlankString {
       ensure(raw.isNotBlank())
       return NotBlankString(raw)
     }
@@ -93,7 +126,7 @@ value class NotBlankString private constructor(val value: String) {
 @JvmInline
 value class NotBlankTrimmedString private constructor(val value: String) { 
   companion object : Exact<String, NotBlankTrimmedString> { 
-    override fun Raise<ExactError>.spec(raw: String): NotBlankTrimmedString { 
+    override fun Raise<String>.spec(raw: String): NotBlankTrimmedString { 
       ensure(raw, NotBlankString)
       return NotBlankTrimmedString(raw.trim())
     }
@@ -101,4 +134,4 @@ value class NotBlankTrimmedString private constructor(val value: String) {
 }
 ```
 
-<!--- KNIT example-readme-03.kt -->
+<!--- KNIT example-readme-04.kt -->

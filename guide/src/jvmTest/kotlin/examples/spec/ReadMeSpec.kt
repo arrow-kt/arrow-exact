@@ -10,7 +10,14 @@ class ReadMeSpec : StringSpec({
     captureOutput("ExampleReadme01") { arrow.exact.knit.example.exampleReadme01.example() }
       .verifyOutputLines(
         "Either.Right(NotBlankString(value=Hello))",
-        "Either.Left(ExactError(message=Failed condition.))"
+        "Either.Left(Failed condition.)"
+      )
+  }
+
+  "ExampleReadme02" {
+    captureOutput("ExampleReadme02") { arrow.exact.knit.example.exampleReadme02.example() }
+      .verifyOutputLines(
+        "Either.Left(String must not be blank.)"
       )
   }
 
