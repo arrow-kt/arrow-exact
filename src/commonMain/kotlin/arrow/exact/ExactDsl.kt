@@ -5,13 +5,16 @@ import arrow.core.raise.Raise
 import arrow.core.raise.RaiseDSL
 
 @RaiseDSL
-public fun Raise<ExactError>.ensure(condition: Boolean) {
-  if (!condition) raise(ExactError("Failed condition."))
+public fun Raise<ErrorMessage>.ensure(condition: Boolean): Unit = ensure(condition) { "Failed condition." }
+
+@RaiseDSL
+public fun Raise<ErrorMessage>.ensure(condition: Boolean, lazyMessage: () -> String) {
+  if (!condition) raise(ErrorMessage(lazyMessage()))
 }
 
 @RaiseDSL
-public fun <A, B> Raise<ExactError>.ensure(raw: A, exact: ExactEither<*, A, B>): B =
-  ensure(raw, exact) { ExactError("Failed to match Exact.") }
+public fun <A, B> Raise<ErrorMessage>.ensure(raw: A, exact: ExactEither<*, A, B>): B =
+  ensure(raw, exact) { ErrorMessage("Failed to match Exact.") }
 
 @RaiseDSL
 public inline fun <A, B, Error : Any, E : Any> Raise<E>.ensure(raw: A, exact: ExactEither<Error, A, B>, error: (Error) -> E): B {
