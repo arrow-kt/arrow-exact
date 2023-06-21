@@ -97,7 +97,7 @@ import kotlin.jvm.JvmInline
  *
  * @see ExactEither if you need to return an [Either] with a custom error type.
  */
-public typealias Exact<A, R> = ExactEither<ErrorMessage, A, R>
+public typealias Exact<Input, Output> = ExactEither<ErrorMessage, Input, Output>
 
 @JvmInline
 public value class ErrorMessage(public val message: String)
