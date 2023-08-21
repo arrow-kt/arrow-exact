@@ -1,13 +1,13 @@
 package examples
 
 import arrow.core.Either
-import arrow.exact.And
-import arrow.exact.BlankInstance.Companion.stringInstance
 import arrow.exact.ExactError
 import arrow.exact.ExactValue
 import arrow.exact.ExactValueSpec
-import arrow.exact.NotBlank
-import arrow.exact.Trimmed
+import arrow.exact.operator.And
+import arrow.exact.operator.BlankInstance.Companion.stringInstance
+import arrow.exact.operator.NotBlank
+import arrow.exact.operator.Trimmed
 
 typealias NotBlankString = ExactValue<String, NotBlank<String>>
 typealias TrimmedString = ExactValue<String, Trimmed>
