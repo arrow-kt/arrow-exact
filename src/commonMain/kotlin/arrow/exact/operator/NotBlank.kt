@@ -3,19 +3,18 @@ package arrow.exact.operator
 import arrow.core.raise.Raise
 import arrow.exact.ExactError
 import arrow.exact.ExactValueSpec
-import arrow.exact.ensure
 
 public class NotBlank<T>(private val blankInstance: BlankInstance<T>) : ExactValueSpec<T> {
     override fun Raise<ExactError>.spec(raw: T): T =
         if (blankInstance.check(raw)) raw
-        else raise(ExactError("Failed condition."))
+        else raise(ExactError("\"$raw\" contains blank."))
 }
 
 public object Trimmed : ExactValueSpec<String> {
-    override fun Raise<ExactError>.spec(raw: String): String {
-        ensure(raw.trim() == raw)
-        return raw
-    }
+    override fun Raise<ExactError>.spec(raw: String): String =
+        if (raw.trim() == raw) raw
+        else raise(ExactError("\"$raw\" contains whitespace."))
+
 }
 
 public interface BlankInstance<T> {
